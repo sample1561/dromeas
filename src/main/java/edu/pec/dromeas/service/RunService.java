@@ -27,48 +27,48 @@ public class RunService
     final String BASE = new File("").getAbsolutePath() + "/scratch/";
     final Long UPPER = (long)1.0E9;
 
-    final String PYTHON = ".py";
     final String C = ".c";
     final String CPP = ".cpp";
+    final String JS = ".js";
+    final String PYTHON = ".py";
+    final String PHP = ".php";
+    final String RUBY = ".rb";
 
-    //Execution Time in milli-seconds
-    final long EXPIRATION = 5000;
+    final long EXPIRATION = 5000;//Execution Time in milli-seconds
 
-    //TODO error handling, code doesn't compile, infinite loop, include header
-    public ResponseEntity<?> runC(InputCode input)
+    public Result runC(InputCode input)
     {
         return runGCC(input, C);
     }
 
-    public ResponseEntity<?> runCpp(InputCode input)
+    public Result runCpp(InputCode input)
     {
         return runGCC(input, CPP);
     }
 
-    private ResponseEntity<?> runGCC(InputCode input, String extension)
+    private Result runGCC(InputCode input, String extension)
     {
         //Step 1 - Create required directory structure
         String code = input.getCode();
-        System.out.println(code);
-        File dir = createDirectory(code,extension);
+        //System.out.println(code);
+        File directory = createDirectory(code,extension);
 
         //Step 2 - Execute the local run-file
         try
         {
             String command = (C.equalsIgnoreCase(extension))?"gcc":"g++";
+            System.out.println("Running command - "+command);
+
             ProcessBuilder compile = new ProcessBuilder(command, "code"+extension);
-            compile.directory(dir);
-
+            compile.directory(directory);
             Process temp = compile.start();
-
-            //TODO guarantee correctness of synchronization
-            // - OR limit compilation time so avoid synchronization
 
             System.out.println("Compilation Began");
 
+
             synchronized (temp)
             {
-                temp.waitFor(1000, TimeUnit.MILLISECONDS);
+                temp.wait();
             }
 
             System.out.println("Code Compiled");
@@ -79,22 +79,9 @@ public class RunService
             }
 
             ProcessBuilder execute = new ProcessBuilder("./a.out");
-            execute.directory(dir);
+            execute.directory(directory);
 
-            Process process = execute.start();
-            System.out.println("Execution began");
-
-            boolean timeLimit = waitFor(process);
-
-            if(timeLimit)
-            {
-                process.destroyForcibly();
-                String message = "Process took long than "+EXPIRATION+" milliseconds to execute";
-                throw new BadRequestException(message,new Exception("Exceeded Time Limit"));
-            }
-
-            System.out.println("Execution Completed");
-            return returnExecutionResult(process, dir);
+            return executeCode(execute,directory);
         }
 
         catch (IOException e)
@@ -108,10 +95,9 @@ public class RunService
             e.printStackTrace();
             throw new ServerException("Failed to Compile Code",e);
         }
-
     }
 
-    public ResponseEntity<?> runJava(InputCode input)
+    public Result runJava(InputCode input)
     {
         /**
         * Create a file with extension .java, for example Hi.java.
@@ -130,73 +116,24 @@ public class RunService
         throw new ServiceNotImplementedException();
     }
 
-    public ResponseEntity<?> runJavaScript(InputCode input)
+    public Result runJavaScript(InputCode input)
     {
-        /**
-        * Create a file code.js
-        * Run node code.js
-        * */
-        throw new ServiceNotImplementedException();
+        return runLanguage(input,JS,getCorrespondingCommand(JS));
     }
 
-    //Fix using reference
-    public ResponseEntity<?> runPython3(InputCode input)
+    public Result runPython3(InputCode input)
     {
-        String code = input.getCode();
-        //System.out.println(code);
-        File dir = createDirectory(code,PYTHON);
-
-        try //Execute the local run-file
-        {
-            ProcessBuilder execute = new ProcessBuilder("python3", "code.py");
-            execute.directory(dir);
-            Process process = execute.start();
-            process.waitFor();
-            return returnExecutionResult(process, dir);
-        }
-        catch (InterruptedException e){
-            e.printStackTrace();
-            throw new ServerException("Failed to run the python file");
-
-        }
-        catch (IOException e)
-        {
-            throw new ServerException("Failed to run the python file", e);
-        }
+        return runLanguage(input,PYTHON,"python3");
     }
 
-    //Duplicate improvements from py3
-    public ResponseEntity<?> runPython2(InputCode input)
+    public Result runPython2(InputCode input)
     {
-        String code = input.getCode();
-        File dir = createDirectory(code,PYTHON);
-
-        try //Execute the local run-file
-        {
-            ProcessBuilder execute = new ProcessBuilder("python2", "code.py");
-            execute.directory(dir);
-            Process process = execute.start();
-            process.waitFor();
-            return returnExecutionResult(process, dir);
-        }
-        catch (InterruptedException e){
-            e.printStackTrace();
-            throw new ServerException("Failed to run the python file");
-
-        }
-        catch (IOException e)
-        {
-            throw new ServerException("Failed to run the python file", e);
-        }
+        return runLanguage(input,PYTHON,"python2");
     }
 
-    public ResponseEntity<?> runPhp(InputCode code)
+    public Result runPhp(InputCode input)
     {
-        /**
-        * create php file
-        * php test.php
-        * */
-        throw new ServiceNotImplementedException();
+        return runLanguage(input,PHP,getCorrespondingCommand(PHP));
     }
 
     public ResponseEntity<?> runScala(InputCode code)
@@ -242,11 +179,51 @@ public class RunService
         throw new ServiceNotImplementedException();
     }
 
-    public ResponseEntity<?> runRuby(InputCode code) {
-        throw new ServiceNotImplementedException();
+    public Result runRuby(InputCode input)
+    {
+        return runLanguage(input,RUBY,getCorrespondingCommand(RUBY));
     }
 
-    private ResponseEntity<?> returnExecutionResult(Process process, File folder)
+    private Result runLanguage(InputCode input, String extension, String command)
+    {
+        //Create the required directory structure with code file
+        String code = input.getCode();
+        System.out.println(code);
+        File directory = createDirectory(code,extension);
+
+        ProcessBuilder execute = new ProcessBuilder(command, "code"+extension);
+        execute.directory(directory);
+
+        return executeCode(execute,directory);
+    }
+
+    private Result executeCode(ProcessBuilder execute,File dir)
+    {
+        try {
+            Process process = execute.start();
+            System.out.println("Execution began");
+
+            boolean timeLimit = waitFor(process);
+
+            if (timeLimit)
+            {
+                process.destroyForcibly();
+                String message = "Process took long than " + EXPIRATION + " milliseconds to execute";
+                throw new BadRequestException(message, new Exception("Exceeded Time Limit"));
+            }
+
+            System.out.println("Execution Completed");
+            return returnExecutionResult(process, dir);
+        }
+
+        catch (IOException e)
+        {
+            e.printStackTrace();
+            throw new ServerException("Failed to execute code");
+        }
+    }
+
+    private Result returnExecutionResult(Process process, File folder)
     {
         try
         {
@@ -276,7 +253,7 @@ public class RunService
             Result result = new Result();
             result.setResult(output.toString());
 
-            return ResponseEntity.status(HttpStatus.OK).body(result);
+            return result;
         }
 
         catch (IOException e)
@@ -285,7 +262,6 @@ public class RunService
         }
     }
 
-    //TODO account for a missing scratch folder
     private File createDirectory(String code, String fileType)
     {
         //First check if the scratch folder exists
@@ -297,7 +273,7 @@ public class RunService
         }
 
         String dirPath = BASE + "dir" + getHash();
-        System.out.println(dirPath);
+        //System.out.println(dirPath);
 
         File folder = new File(dirPath);
 
@@ -342,6 +318,20 @@ public class RunService
         while(endTime >= System.currentTimeMillis() && process.isAlive());
 
         return process.isAlive();
+    }
+
+    private String getCorrespondingCommand(String extension)
+    {
+        if(extension.equalsIgnoreCase(JS))
+            return "node";
+
+        if(extension.equalsIgnoreCase(PHP))
+            return "php";
+
+        if(extension.equalsIgnoreCase(RUBY))
+            return "ruby";
+
+        throw new ServerException("Invalid Language Input");
     }
 
     void throwError(Process temp, String type)

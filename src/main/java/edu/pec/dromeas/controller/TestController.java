@@ -23,17 +23,39 @@ public class TestController
         return testService.systemStat();
     }
 
-    //TODO can be used to test all language against a reference code
     @GetMapping({"","/"})
     public ResponseEntity<?> systemTest()
     {
         return testService.systemTest();
     }
 
-  /*  @GetMapping("/tessa")
-    public ResponseEntity<?> runTessaract()
+    @GetMapping({"support","lang","language","languages"})
+    public ResponseEntity<?> seeSupportedLanguages()
     {
-        return testService.runTessaract();
-    }*/
+        return testService.testLanguages();
+    }
 
+    @GetMapping("/all")
+    public ResponseEntity<?> testAllLanguages()
+    {
+        return ResponseEntity.ok(testService.testAllCodes());
+    }
+
+    @GetMapping("/c")
+    public ResponseEntity<?> testCCodes()
+    {
+        return ResponseEntity.ok(testService.testCCode());
+    }
+
+    @GetMapping("/cpp")
+    public ResponseEntity<?> testCppCodes()
+    {
+        return ResponseEntity.ok(testService.testCppCode());
+    }
+
+    @GetMapping({"/js","javascript"})
+    public ResponseEntity<?> testJsCodes()
+    {
+        return ResponseEntity.ok(testService.testJsCode());
+    }
 }

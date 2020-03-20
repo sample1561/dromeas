@@ -5,8 +5,10 @@ import lombok.Data;
 @Data
 public class SystemStat
 {
-    private long maxMemory;
-    private long freeMemory;
-    private long totalMemory;
+    private double maxMemory;
+    private double freeMemory;
+    private double totalMemory;
     private long processors;
+    private double totalDisk;
+    private double freeDisk;
 }

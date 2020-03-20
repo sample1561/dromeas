@@ -3,6 +3,7 @@ package edu.pec.dromeas;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+//TODO add Swagger for API Documentation
 @SpringBootApplication
 public class DromeasApplication
 {
@@ -11,4 +12,4 @@ public class DromeasApplication
     }
 }
 
-//TODO add Swagger for API Documentation
+

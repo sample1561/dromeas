@@ -2,6 +2,7 @@ package edu.pec.dromeas.controller;
 
 import edu.pec.dromeas.payload.InputCode;
 import edu.pec.dromeas.service.RunService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,51 +23,47 @@ public class RunController
         this.runService = runService;
     }
 
-    @PostMapping({"/python3","/py3"})
-    public ResponseEntity<?> runPython3Code(@RequestBody @Valid InputCode code)
-    {
-        return runService.runPython3(code);
-    }
-
-    //TODO Python2
     @PostMapping({"python2","/py2"})
     public ResponseEntity<?> runPython2Code(@RequestBody @Valid InputCode code)
     {
-        return runService.runPython2(code);
+        return ResponseEntity.status(HttpStatus.OK).body(runService.runPython2(code));
+    }
+
+    @PostMapping({"/python3","/py3"})
+    public ResponseEntity<?> runPython3Code(@RequestBody @Valid InputCode code)
+    {
+        return ResponseEntity.status(HttpStatus.OK).body(runService.runPython3(code));
     }
 
     @PostMapping({"/c"})
     public ResponseEntity<?> runCCode(@RequestBody @Valid InputCode code)
     {
-        return runService.runC(code);
+        return ResponseEntity.status(HttpStatus.OK).body(runService.runC(code));
     }
 
-    //TODO CPP
     @PostMapping({"/cpp"})
     public ResponseEntity<?> runCppCode(@RequestBody @Valid InputCode code)
     {
-        return runService.runCpp(code);
+        return ResponseEntity.status(HttpStatus.OK).body(runService.runCpp(code));
     }
 
-    //TODO JavaScript
     @PostMapping({"/javascript","js"})
     public ResponseEntity<?> runJavascriptCode(@RequestBody @Valid InputCode code)
     {
-        return runService.runJavaScript(code);
+        return ResponseEntity.status(HttpStatus.OK).body(runService.runJavaScript(code));
     }
 
     //TODO Java
     @PostMapping({"/java"})
     public ResponseEntity<?> runJavaCode(@RequestBody @Valid InputCode code)
     {
-        return runService.runJava(code);
+        return ResponseEntity.status(HttpStatus.OK).body(runService.runJava(code));
     }
 
-    //TODO PHP
     @PostMapping({"/php"})
     public ResponseEntity<?> runPhpCode(@RequestBody @Valid InputCode code)
     {
-        return runService.runPhp(code);
+        return ResponseEntity.status(HttpStatus.OK).body(runService.runPhp(code));
     }
 
     //TODO Scala
@@ -97,11 +94,10 @@ public class RunController
         return runService.runKotlin(code);
     }
 
-    //TODO Ruby
-    @PostMapping({"/ruby"})
+    @PostMapping({"/ruby","/rb"})
     public ResponseEntity<?> runRubyCode(@RequestBody @Valid InputCode code)
     {
-        return runService.runRuby(code);
+        return ResponseEntity.status(HttpStatus.OK).body(runService.runRuby(code));
     }
 
     //TODO Swift

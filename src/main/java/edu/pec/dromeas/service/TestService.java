@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
-import java.nio.file.FileStore;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashSet;
@@ -26,6 +25,7 @@ public class TestService
     final String C = "C";
     final String CPP = "CPP";
     final String JS = "JavaScript";
+
 
     public TestService(RunService runService)
     {
@@ -280,7 +280,7 @@ public class TestService
 
     private String executeCode(String code, String type)
     {
-        InputCode input = new InputCode();
+        Code input = new Code();
         input.setCode(code);
 
         if(type.equals(C))

@@ -1,12 +1,9 @@
 package edu.pec.dromeas.service;
 
-import edu.pec.dromeas.payload.InputCode;
-import org.apache.commons.io.IOUtils;
-import org.junit.Assert.*;
+import edu.pec.dromeas.payload.Code;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Objects;
 
@@ -35,7 +32,7 @@ class RunServiceTest
 
         for(File current : Objects.requireNonNull(directory.listFiles()))
         {
-            InputCode input = new InputCode();
+            Code input = new Code();
             String code = current.toString();
             input.setCode(code);
 

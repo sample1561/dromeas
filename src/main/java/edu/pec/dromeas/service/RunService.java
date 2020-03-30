@@ -3,23 +3,18 @@ package edu.pec.dromeas.service;
 import edu.pec.dromeas.exception.ServerException;
 import edu.pec.dromeas.exception.ServiceNotImplementedException;
 import edu.pec.dromeas.exception.BadRequestException;
-import edu.pec.dromeas.payload.InputCode;
+import edu.pec.dromeas.payload.Code;
 import edu.pec.dromeas.payload.Result;
 
 import org.apache.commons.io.IOUtils;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import javax.naming.TimeLimitExceededException;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.concurrent.TimeUnit;
 
 import static org.apache.commons.io.FileUtils.deleteDirectory;
-import static org.apache.commons.io.FileUtils.sizeOf;
-
 
 @Service
 public class RunService
@@ -34,19 +29,20 @@ public class RunService
     final String PHP = ".php";
     final String RUBY = ".rb";
 
-    final long EXPIRATION = 5000;//Execution Time in milli-seconds
+    //TODO add in application.property
+    final long EXPIRATION = 5000L;
 
-    public Result runC(InputCode input)
+    public Result runC(Code input)
     {
         return runGCC(input, C);
     }
 
-    public Result runCpp(InputCode input)
+    public Result runCpp(Code input)
     {
         return runGCC(input, CPP);
     }
 
-    private Result runGCC(InputCode input, String extension)
+    private Result runGCC(Code input, String extension)
     {
         //Step 1 - Create required directory structure
         String code = input.getCode();
@@ -66,6 +62,8 @@ public class RunService
             System.out.println("Compilation Began");
 
 
+            //TODO there has to be a better way to synchronize the application
+            // - Also had threading
             synchronized (temp)
             {
                 temp.wait();
@@ -97,7 +95,7 @@ public class RunService
         }
     }
 
-    public Result runJava(InputCode input)
+    public Result runJava(Code input)
     {
         /**
         * Create a file with extension .java, for example Hi.java.
@@ -116,27 +114,27 @@ public class RunService
         throw new ServiceNotImplementedException();
     }
 
-    public Result runJavaScript(InputCode input)
+    public Result runJavaScript(Code input)
     {
         return runLanguage(input,JS,getCorrespondingCommand(JS));
     }
 
-    public Result runPython3(InputCode input)
+    public Result runPython3(Code input)
     {
         return runLanguage(input,PYTHON,"python3");
     }
 
-    public Result runPython2(InputCode input)
+    public Result runPython2(Code input)
     {
         return runLanguage(input,PYTHON,"python2");
     }
 
-    public Result runPhp(InputCode input)
+    public Result runPhp(Code input)
     {
         return runLanguage(input,PHP,getCorrespondingCommand(PHP));
     }
 
-    public ResponseEntity<?> runScala(InputCode code)
+    public ResponseEntity<?> runScala(Code code)
     {
         /**
         * object HelloWorld {
@@ -154,7 +152,7 @@ public class RunService
         throw new ServiceNotImplementedException();
     }
 
-    public ResponseEntity<?> runGo(InputCode code)
+    public ResponseEntity<?> runGo(Code code)
     {
         /**
          * install GoLang on WSL
@@ -163,28 +161,28 @@ public class RunService
         throw new ServiceNotImplementedException();
     }
 
-    public ResponseEntity<?> runKotlin(InputCode code) {
+    public ResponseEntity<?> runKotlin(Code code) {
         throw new ServiceNotImplementedException();
     }
 
-    public ResponseEntity<?> runRust(InputCode code) {
+    public ResponseEntity<?> runRust(Code code) {
         throw new ServiceNotImplementedException();
     }
 
-    public ResponseEntity<?> runCS(InputCode code) {
+    public ResponseEntity<?> runCS(Code code) {
         throw new ServiceNotImplementedException();
     }
 
-    public ResponseEntity<?> runSwift(InputCode code) {
+    public ResponseEntity<?> runSwift(Code code) {
         throw new ServiceNotImplementedException();
     }
 
-    public Result runRuby(InputCode input)
+    public Result runRuby(Code input)
     {
         return runLanguage(input,RUBY,getCorrespondingCommand(RUBY));
     }
 
-    private Result runLanguage(InputCode input, String extension, String command)
+    private Result runLanguage(Code input, String extension, String command)
     {
         //Create the required directory structure with code file
         String code = input.getCode();
@@ -203,6 +201,7 @@ public class RunService
             Process process = execute.start();
             System.out.println("Execution began");
 
+            //TODO see how to properly implement a timeout
             boolean timeLimit = waitFor(process);
 
             if (timeLimit)

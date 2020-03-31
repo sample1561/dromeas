@@ -1,8 +1,11 @@
 package edu.pec.dromeas.service;
 
+import edu.pec.dromeas.config.Language;
 import edu.pec.dromeas.exception.ServerException;
 import edu.pec.dromeas.exception.ServiceNotImplementedException;
 import edu.pec.dromeas.payload.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -19,27 +22,25 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class TestService
 {
-    private final RunService runService;
+    private final ExecuteService executeService;
     String BASE = new File("").getAbsolutePath() + "/testCases";
-
-    final String C = "C";
-    final String CPP = "CPP";
-    final String JS = "JavaScript";
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestService.class);
 
 
-    public TestService(RunService runService)
+    public TestService(ExecuteService executeService)
     {
-        this.runService = runService;
+        this.executeService = executeService;
     }
 
-    public ResponseEntity<?> systemTest() {
-        System.out.print("A string of text in the console");
+    public ResponseEntity<?> systemTest()
+    {
+        LOGGER.info("A string of text in the console");
         return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).body("I am a teapot");
     }
 
     public ResponseEntity<?> systemStat()
     {
-        SystemStat stat = new SystemStat();
+        SystemStatistics stat = new SystemStatistics();
         File file = new File(BASE);
 
         stat.setMaxMemory(convertToMb(Runtime.getRuntime().maxMemory()));
@@ -54,37 +55,39 @@ public class TestService
 
     public Set<AllResults> testAllCodes()
     {
-        throw new ServiceNotImplementedException("Service Under Maintenance");
-//        String[] languages = {C,CPP,JS};
-//        Set<AllResults> results = new HashSet<>();
-//
-//        for(String language : languages)
-//        {
-//            AllResults current = new AllResults();
-//            current.setLanguage(language);
-//            current.setTests(testCode(language));
-//
-//            results.add(current);
-//        }
-//
-//        return results;
+        //throw new ServiceNotImplementedException("Service Under Maintenance");
+
+        Set<AllResults> results = new HashSet<>();
+        Language[] supported = {Language.C,Language.CPP,Language.JavaScript};
+
+        for(Language language: supported)
+        {
+            AllResults current = new AllResults();
+            current.setLanguage(language.name());
+            current.setTests(testCode(language));
+
+            results.add(current);
+        }
+
+        return results;
     }
 
     public Set<Tests> testCCode() {
-        return testCode(C);
+        return testCode(Language.C);
     }
 
     public Set<Tests> testCppCode() {
-        return testCode(CPP);
+        return testCode(Language.CPP);
     }
 
     public Set<Tests> testJsCode()
     {
-        return testCode(JS);
+        return testCode(Language.JavaScript);
     }
 
-    public Set<Tests> testCode(String type)
+    public Set<Tests> testCode(Language language)
     {
+        String type = getType(language);
         File inputCode = new File(BASE+"/"+type+"/codes");
         //System.out.println("Input Folder -> "+inputCode);
 
@@ -112,8 +115,6 @@ public class TestService
             }
         }
 
-        System.out.println("Read All the expected outputs");
-
         i = 0;
         Set<Tests> results = new HashSet<>();
 
@@ -123,7 +124,7 @@ public class TestService
 
                 String code = readFileAsString(current.getAbsolutePath());
 
-                String execution = executeCode(code, type);
+                String execution = executeCode(code, language);
 
                 Tests currentTest = new Tests();
                 currentTest.setTest(i+1);
@@ -131,9 +132,7 @@ public class TestService
 
                 results.add(currentTest);
 
-                System.out.println("Expected - "+(i+1)+"\t-> "+outputs[i]);
-                System.out.println("Execution - "+(i+1)+"\t-> "+execution);
-                System.out.println();
+                LOGGER.info("Test: "+(i+1)+" | Expected: "+outputs[i]+" | Executed: "+execution);
             }
 
             catch (Exception e)
@@ -149,6 +148,24 @@ public class TestService
 
     }
 
+    private String getType(Language language)
+    {
+        switch (language)
+        {
+            case C:
+                return "C";
+
+            case CPP:
+                return "CPP";
+
+            case JavaScript:
+                return "JavaScript";
+
+            default:
+                throw new ServerException("Unrecognised language "+language.name());
+        }
+    }
+
     public ResponseEntity<?> testLanguages()
     {
         try
@@ -156,66 +173,67 @@ public class TestService
             int i = -1;
 
             Languages languages = new Languages();
+
             //C
             languages.setC(getVersion("gcc","--version"));
-            System.out.println(++i);
+            LOGGER.info("C = "+languages.getC());
 
             //C++
             languages.setCPP(getVersion("g++","--version"));
-            System.out.println(++i);
+            LOGGER.info("CPP = "+languages.getCPP());
 
             //C#
             //TODO find command
             languages.setCS("Not Installed");
-            System.out.println(++i);
+            LOGGER.info("C# = "+languages.getCS());
 
             //Java
             languages.setJava(getVersion("java","--version"));
-            System.out.println(++i);
+            LOGGER.info("Java = "+languages.getJava());
 
             //Scala
             languages.setScala(getVersion("scala","-version"));
-            System.out.println(++i);
+            LOGGER.info("Scala = "+languages.getScala());
 
             //JavaScript
             languages.setJavaScript(getVersion("node","--version"));
-            System.out.println(++i);
+            LOGGER.info("JavaScript = "+languages.getJavaScript());
 
             //Python 2
             languages.setPython2(getVersion("python2","--version"));
-            System.out.println(++i);
+            LOGGER.info("Python2 = "+languages.getPython2());
 
             //Python 3
             languages.setPython3(getVersion("python3","--version"));
-            System.out.println(++i);
+            LOGGER.info("Python3 = "+languages.getPython3());
 
             //Php
             languages.setPhp(getVersion("php","--version"));
-            System.out.println(++i);
+            LOGGER.info("Php = "+languages.getPhp());
 
             //Go
             //languages.setGo(getVersion("go","version"));
             languages.setGo("Not Installed");
-            System.out.println(++i);
+            LOGGER.info("GoLang = "+languages.getGo());
 
             //Kotlin
             //languages.setKotlin(getVersion("kotlinc","version"));
             languages.setKotlin("Not Installed");
-            System.out.println(++i);
+            LOGGER.info("Kotlin = "+languages.getKotlin());
 
             //Ruby
             languages.setRuby(getVersion("ruby","--version"));
-            System.out.println(++i);
+            LOGGER.info("Ruby = "+languages.getRuby());
 
             //Rust
             //languages.setRust(getVersion("rustc","--version"));
             languages.setRust("Not Installed");
-            System.out.println(++i);
+            LOGGER.info("Rust = "+languages.getRust());
 
             //Swift
             //languages.setSwift(getVersion("swift","-version"));
             languages.setSwift("Not Installed");
-            System.out.println(++i);
+            LOGGER.info("Swift = "+languages.getSwift());
 
             return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).body(languages);
         }
@@ -278,18 +296,22 @@ public class TestService
         return new String(Files.readAllBytes(Paths.get(fileName)));
     }
 
-    private String executeCode(String code, String type)
+    private String executeCode(String code, Language language)
     {
         Code input = new Code();
         input.setCode(code);
 
-        if(type.equals(C))
-            return runService.runC(input).getResult();
+        switch (language)
+        {
+            case C:
+                return executeService.runC(input).getResult();
 
-        else if(type.equals(CPP))
-            return runService.runCpp(input).getResult();
+            case CPP:
+                return executeService.runCpp(input).getResult();
 
-        throw new ServerException("Server not configured for "+type);
+            default:
+                throw new ServerException("Server not configured for "+language.name());
+        }
     }
 
     private double convertToMb(Long bytes)

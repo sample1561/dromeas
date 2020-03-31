@@ -2,6 +2,7 @@ package edu.pec.dromeas;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Configuration;
 
 //TODO add Swagger for API Documentation
 
@@ -14,6 +15,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 
 @SpringBootApplication
+@Configuration
 public class DromeasApplication
 {
     public static void main(String[] args) {

@@ -58,7 +58,7 @@ public class TestService
         //throw new ServiceNotImplementedException("Service Under Maintenance");
 
         Set<AllResults> results = new HashSet<>();
-        Language[] supported = {Language.C,Language.CPP,Language.JavaScript};
+        Language[] supported = {Language.C, Language.CPP, Language.JavaScript, Language.Php};
 
         for(Language language: supported)
         {
@@ -85,6 +85,11 @@ public class TestService
         return testCode(Language.JavaScript);
     }
 
+    public Set<Tests> testPhpCode()
+    {
+        return testCode(Language.Php);
+    }
+
     public Set<Tests> testCode(Language language)
     {
         String type = getType(language);
@@ -93,6 +98,11 @@ public class TestService
 
         File codeOutput = new File(BASE+"/"+type+"/results");
         //System.out.println("Results Folder -> "+codeOutput);
+
+        if(!inputCode.exists() || !codeOutput.exists())
+        {
+            return null;
+        }
 
         int numberOfFiles = Objects.requireNonNull(codeOutput.listFiles()).length;
         //System.out.println("Number of files -> "+numberOfFiles);
@@ -160,6 +170,9 @@ public class TestService
 
             case JavaScript:
                 return "JavaScript";
+
+            case Php:
+                return "PHP";
 
             default:
                 throw new ServerException("Unrecognised language "+language.name());
@@ -308,6 +321,12 @@ public class TestService
 
             case CPP:
                 return executeService.runCpp(input).getResult();
+
+            case JavaScript:
+                return executeService.runJavaScript(input).getResult();
+
+            case Php:
+                return executeService.runPhp(input).getResult();
 
             default:
                 throw new ServerException("Server not configured for "+language.name());

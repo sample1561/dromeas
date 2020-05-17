@@ -24,7 +24,7 @@ public class ExecuteController
         this.executeService = executeService;
     }
 
-    @PostMapping({"python2","/py2"})
+    @PostMapping({"/python2","/py2"})
     public ResponseEntity<?> runPython2Code(@RequestBody @Valid Code code)
     {
         return ResponseEntity.status(HttpStatus.OK).body(executeService.runPython2(code));

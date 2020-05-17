@@ -73,7 +73,7 @@ public class ExecuteService
 
     public Result runPython2(Code input)
     {
-        return runLanguage(input,Language.Python3);
+        return runLanguage(input,Language.Python2);
     }
 
     public Result runPhp(Code input)

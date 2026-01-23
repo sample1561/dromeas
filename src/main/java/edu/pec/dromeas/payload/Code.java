@@ -1,7 +1,8 @@
 package edu.pec.dromeas.payload;
 
-import javax.validation.constraints.NotBlank;
 import lombok.Data;
+
+import jakarta.validation.constraints.NotBlank;
 
 @Data
 public class Code {

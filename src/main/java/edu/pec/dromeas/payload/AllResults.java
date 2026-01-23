@@ -1,12 +1,10 @@
 package edu.pec.dromeas.payload;
 
+import java.util.Set;
 import lombok.Data;
 
-import java.util.Set;
-
 @Data
-public class AllResults
-{
-    private String language;
-    private Set<Tests> tests;
+public class AllResults {
+  private String language;
+  private Set<Tests> tests;
 }

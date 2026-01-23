@@ -5,63 +5,58 @@ import edu.pec.dromeas.exception.ServerException;
 import org.springframework.stereotype.Service;
 
 @Service
-public class LanguageService
-{
-    public String getExtension(Language language)
-    {
-        switch (language)
-        {
-            case C:
-                return ".c";
+public class LanguageService {
+  public String getExtension(Language language) {
+    switch (language) {
+      case C:
+        return ".c";
 
-            case CPP:
-                return ".cpp";
+      case CPP:
+        return ".cpp";
 
-            case JavaScript:
-                return ".js";
+      case JavaScript:
+        return ".js";
 
-            case Python2:
-            case Python3:
-                return ".py";
+      case Python2:
+      case Python3:
+        return ".py";
 
-            case Php:
-                return ".php";
+      case Php:
+        return ".php";
 
-            case Ruby:
-                return ".rb";
+      case Ruby:
+        return ".rb";
 
-            default:
-                throw new ServerException("Unknown Language "+language.name());
-        }
+      default:
+        throw new ServerException("Unknown Language " + language.name());
     }
+  }
 
-    public String getCommand(Language language)
-    {
-        switch (language)
-        {
-            case C:
-                return "gcc";
+  public String getCommand(Language language) {
+    switch (language) {
+      case C:
+        return "gcc";
 
-            case CPP:
-                return "g++";
+      case CPP:
+        return "g++";
 
-            case JavaScript:
-                return "node";
+      case JavaScript:
+        return "node";
 
-            case Php:
-                return "php";
+      case Php:
+        return "php";
 
-            case Python2:
-                return "python2";
+      case Python2:
+        return "python2";
 
-            case Python3:
-                return "python3";
+      case Python3:
+        return "python3";
 
-            case Ruby:
-                return "ruby";
+      case Ruby:
+        return "ruby";
 
-            default:
-                throw new ServerException("Unknown Language "+language.name());
-        }
+      default:
+        throw new ServerException("Unknown Language " + language.name());
     }
+  }
 }

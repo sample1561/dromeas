@@ -8,11 +8,28 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service responsible for creating and managing temporary local files for code execution.
+ * Files are stored in a scratch folder on the local filesystem.
+ */
 @Service
 public class FileService {
+
+  /** Base directory for temporary files */
   final String BASE = new File("").getAbsolutePath() + "/scratch/";
+
+  /** Upper limit for random hash generation */
   final Long UPPER = (long) 1.0E9;
 
+  /**
+   * Creates a local folder with a unique hash-based name inside the scratch directory,
+   * and writes the provided code to a file with the given file type.
+   *
+   * @param code The source code content to write
+   * @param fileType The file extension (including the dot), e.g., ".py", ".c"
+   * @return The folder containing the created code file
+   * @throws ServerException If the scratch folder or code file cannot be created
+   */
   public File createLocalFile(String code, String fileType) {
     // First check if the scratch folder exists
     if (!Files.exists(Paths.get(BASE))) {
@@ -21,8 +38,6 @@ public class FileService {
     }
 
     String dirPath = BASE + "dir" + getHash();
-    // System.out.println(dirPath);
-
     File folder = new File(dirPath);
 
     if (!folder.mkdir()) {
@@ -49,6 +64,11 @@ public class FileService {
     return folder;
   }
 
+  /**
+   * Generates a random hash number used for creating unique folder names.
+   *
+   * @return A long value representing a random hash
+   */
   private Long getHash() {
     return (long) (Math.random() * UPPER);
   }

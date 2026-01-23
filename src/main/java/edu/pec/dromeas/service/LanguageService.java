@@ -39,15 +39,10 @@ public class LanguageService {
    * @throws ServerException if the language is unknown or unsupported
    */
   public String getCommand(Language language) {
-    switch (language) {
-      case C:
-        return "gcc";
-
-      case CPP:
-        return "g++";
-
-      default:
-        throw new ServerException("Unknown Language " + language.name());
-    }
+      return switch (language) {
+          case C -> "gcc";
+          case CPP -> "g++";
+          default -> throw new ServerException("Unknown Language " + language.name());
+      };
   }
 }

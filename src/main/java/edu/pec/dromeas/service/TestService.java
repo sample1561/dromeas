@@ -46,7 +46,7 @@ public class TestService {
    */
   public ResponseEntity<?> systemTest() {
     LOGGER.info("A string of text in the console");
-    return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).body("I am a teapot");
+    return ResponseEntity.status(HttpStatus.OK).body("I am a teapot");
   }
 
   /**
@@ -247,7 +247,7 @@ public class TestService {
       languages.setSwift("Not Installed");
       LOGGER.info("Swift = " + languages.getSwift());
 
-      return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).body(languages);
+      return ResponseEntity.status(HttpStatus.OK).body(languages);
 
     } catch (Exception e) {
       e.printStackTrace();

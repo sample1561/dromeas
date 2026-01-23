@@ -4,6 +4,7 @@ import edu.pec.dromeas.exception.ServerException;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import org.springframework.stereotype.Service;
@@ -47,7 +48,7 @@ public class FileService {
     try {
       String filePath = folder.getAbsolutePath() + "/code" + fileType;
 
-      PrintWriter writer = new PrintWriter(filePath, "UTF-8");
+      PrintWriter writer = new PrintWriter(filePath, StandardCharsets.UTF_8);
       writer.println(code);
       writer.close();
 

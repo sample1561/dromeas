@@ -28,7 +28,6 @@ public class ExecuteController {
   public ResponseEntity<?> runCppCode(@RequestBody @Valid Code code) {
     return ResponseEntity.status(HttpStatus.OK).body(executeService.runCpp(code));
   }
-
 }
 
 // TODO leetcode also inserts escape sequences to account for JSON rule

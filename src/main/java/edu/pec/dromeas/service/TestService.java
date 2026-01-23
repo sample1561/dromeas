@@ -18,8 +18,8 @@ import org.springframework.stereotype.Service;
 
 /**
  * Service class responsible for executing and testing code in different programming languages.
- * Provides system statistics, language version information, and the ability to run and verify
- * test cases for C, C++, JavaScript, and PHP.
+ * Provides system statistics, language version information, and the ability to run and verify test
+ * cases for C, C++, JavaScript, and PHP.
  */
 @Service
 public class TestService {
@@ -150,7 +150,7 @@ public class TestService {
         results.add(currentTest);
 
         LOGGER.info(
-                "Test: " + (i + 1) + " | Expected: " + outputs[i] + " | Executed: " + execution);
+            "Test: " + (i + 1) + " | Expected: " + outputs[i] + " | Executed: " + execution);
       } catch (Exception e) {
         e.printStackTrace();
         throw new ServerException("Failed to read contents of " + current.getName());
@@ -170,9 +170,12 @@ public class TestService {
    */
   private String getType(Language language) {
     switch (language) {
-      case C: return "C";
-      case CPP: return "CPP";
-      default: throw new ServerException("Unrecognised language " + language.name());
+      case C:
+        return "C";
+      case CPP:
+        return "CPP";
+      default:
+        throw new ServerException("Unrecognised language " + language.name());
     }
   }
 
@@ -204,7 +207,8 @@ public class TestService {
    *
    * @param command Primary command
    * @param command2 Argument for version retrieval
-   * @return Version string, "Not Installed" if not found, or "Request Timeout" if command takes too long
+   * @return Version string, "Not Installed" if not found, or "Request Timeout" if command takes too
+   *     long
    */
   private String getVersion(String command, String command2) {
     try {
@@ -258,7 +262,7 @@ public class TestService {
   /**
    * Executes code in a specific language using ExecuteService.
    *
-   * @param code     Code to execute
+   * @param code Code to execute
    * @param language Language to execute
    * @return Execution result as string
    * @throws ServerException if language is unsupported
@@ -267,11 +271,11 @@ public class TestService {
     Code input = new Code();
     input.setCode(code);
 
-      return switch (language) {
-          case C -> executeService.runC(input).getResult();
-          case CPP -> executeService.runCpp(input).getResult();
-          default -> throw new ServerException("Server not configured for " + language.name());
-      };
+    return switch (language) {
+      case C -> executeService.runC(input).getResult();
+      case CPP -> executeService.runCpp(input).getResult();
+      default -> throw new ServerException("Server not configured for " + language.name());
+    };
   }
 
   /**

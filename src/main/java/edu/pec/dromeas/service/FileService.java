@@ -9,8 +9,8 @@ import java.nio.file.Paths;
 import org.springframework.stereotype.Service;
 
 /**
- * Service responsible for creating and managing temporary local files for code execution.
- * Files are stored in a scratch folder on the local filesystem.
+ * Service responsible for creating and managing temporary local files for code execution. Files are
+ * stored in a scratch folder on the local filesystem.
  */
 @Service
 public class FileService {
@@ -22,8 +22,8 @@ public class FileService {
   final Long UPPER = (long) 1.0E9;
 
   /**
-   * Creates a local folder with a unique hash-based name inside the scratch directory,
-   * and writes the provided code to a file with the given file type.
+   * Creates a local folder with a unique hash-based name inside the scratch directory, and writes
+   * the provided code to a file with the given file type.
    *
    * @param code The source code content to write
    * @param fileType The file extension (including the dot), e.g., ".py", ".c"

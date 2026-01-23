@@ -17,9 +17,10 @@ import org.springframework.stereotype.Service;
 
 /**
  * Service responsible for executing code in various programming languages.
- * <p>
- * Supports C, C++, JavaScript, Python, PHP, Ruby, and has placeholders for Java, Scala, Go, Kotlin,
- * Rust, C#, and Swift. Code is executed in a temporary directory and cleaned up after execution.
+ *
+ * <p>Supports C, C++, JavaScript, Python, PHP, Ruby, and has placeholders for Java, Scala, Go,
+ * Kotlin, Rust, C#, and Swift. Code is executed in a temporary directory and cleaned up after
+ * execution.
  */
 @Service
 public class ExecuteService {
@@ -258,7 +259,8 @@ public class ExecuteService {
    */
   private boolean waitFor(Process process) {
     long endTime = System.currentTimeMillis() + EXPIRATION;
-    while (endTime >= System.currentTimeMillis() && process.isAlive());
+    while (endTime >= System.currentTimeMillis() && process.isAlive())
+      ;
     return process.isAlive();
   }
 

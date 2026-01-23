@@ -5,8 +5,8 @@ import edu.pec.dromeas.exception.ServerException;
 import org.springframework.stereotype.Service;
 
 /**
- * Service for handling operations related to programming languages,
- * such as retrieving file extensions and execution commands.
+ * Service for handling operations related to programming languages, such as retrieving file
+ * extensions and execution commands.
  */
 @Service
 public class LanguageService {

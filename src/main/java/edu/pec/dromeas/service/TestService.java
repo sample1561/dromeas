@@ -168,14 +168,11 @@ public class TestService {
    * @throws ServerException if language is unrecognized
    */
   private String getType(Language language) {
-    switch (language) {
-      case C:
-        return "C";
-      case CPP:
-        return "CPP";
-      default:
-        throw new ServerException("Unrecognised language " + language.name());
-    }
+      return switch (language) {
+          case C -> "C";
+          case CPP -> "CPP";
+          default -> throw new ServerException("Unrecognised language " + language.name());
+      };
   }
 
   /**

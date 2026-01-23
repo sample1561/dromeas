@@ -75,7 +75,7 @@ public class TestService {
    */
   public Set<AllResults> testAllCodes() {
     Set<AllResults> results = new HashSet<>();
-    Language[] supported = {Language.C, Language.CPP, Language.JavaScript, Language.Php};
+    Language[] supported = {Language.C, Language.CPP};
 
     for (Language language : supported) {
       AllResults current = new AllResults();
@@ -104,24 +104,6 @@ public class TestService {
    */
   public Set<Tests> testCppCode() {
     return testCode(Language.CPP);
-  }
-
-  /**
-   * Runs all test cases for JavaScript code.
-   *
-   * @return Set of Tests results for JavaScript language
-   */
-  public Set<Tests> testJsCode() {
-    return testCode(Language.JavaScript);
-  }
-
-  /**
-   * Runs all test cases for PHP code.
-   *
-   * @return Set of Tests results for PHP language
-   */
-  public Set<Tests> testPhpCode() {
-    return testCode(Language.Php);
   }
 
   /**
@@ -190,8 +172,6 @@ public class TestService {
     switch (language) {
       case C: return "C";
       case CPP: return "CPP";
-      case JavaScript: return "JavaScript";
-      case Php: return "PHP";
       default: throw new ServerException("Unrecognised language " + language.name());
     }
   }
@@ -290,8 +270,6 @@ public class TestService {
       return switch (language) {
           case C -> executeService.runC(input).getResult();
           case CPP -> executeService.runCpp(input).getResult();
-          case JavaScript -> executeService.runJavaScript(input).getResult();
-          case Php -> executeService.runPhp(input).getResult();
           default -> throw new ServerException("Server not configured for " + language.name());
       };
   }

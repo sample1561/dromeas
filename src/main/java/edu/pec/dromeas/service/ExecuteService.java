@@ -74,46 +74,6 @@ public class ExecuteService {
   }
 
   /**
-   * Executes JavaScript code using Node.js.
-   *
-   * @param input Code payload
-   * @return Result containing execution output
-   */
-  public Result runJavaScript(Code input) {
-    return runLanguage(input, Language.JavaScript);
-  }
-
-  /**
-   * Executes Python 3 code.
-   *
-   * @param input Code payload
-   * @return Result containing execution output
-   */
-  public Result runPython3(Code input) {
-    return runLanguage(input, Language.Python3);
-  }
-
-  /**
-   * Executes Python 2 code.
-   *
-   * @param input Code payload
-   * @return Result containing execution output
-   */
-  public Result runPython2(Code input) {
-    return runLanguage(input, Language.Python2);
-  }
-
-  /**
-   * Executes PHP code.
-   *
-   * @param input Code payload
-   * @return Result containing execution output
-   */
-  public Result runPhp(Code input) {
-    return runLanguage(input, Language.Php);
-  }
-
-  /**
    * Placeholder for Scala execution.
    *
    * @param code Code payload
@@ -171,16 +131,6 @@ public class ExecuteService {
    */
   public ResponseEntity<?> runSwift(Code code) {
     throw new ServiceNotImplementedException();
-  }
-
-  /**
-   * Executes Ruby code.
-   *
-   * @param input Code payload
-   * @return Result containing execution output
-   */
-  public Result runRuby(Code input) {
-    return runLanguage(input, Language.Ruby);
   }
 
   /**

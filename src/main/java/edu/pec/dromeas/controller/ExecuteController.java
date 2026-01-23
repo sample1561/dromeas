@@ -19,16 +19,6 @@ public class ExecuteController {
     this.executeService = executeService;
   }
 
-  @PostMapping({"/python2", "/py2"})
-  public ResponseEntity<?> runPython2Code(@RequestBody @Valid Code code) {
-    return ResponseEntity.status(HttpStatus.OK).body(executeService.runPython2(code));
-  }
-
-  @PostMapping({"/python3", "/py3"})
-  public ResponseEntity<?> runPython3Code(@RequestBody @Valid Code code) {
-    return ResponseEntity.status(HttpStatus.OK).body(executeService.runPython3(code));
-  }
-
   @PostMapping({"/c"})
   public ResponseEntity<?> runCCode(@RequestBody @Valid Code code) {
     return ResponseEntity.status(HttpStatus.OK).body(executeService.runC(code));
@@ -39,20 +29,10 @@ public class ExecuteController {
     return ResponseEntity.status(HttpStatus.OK).body(executeService.runCpp(code));
   }
 
-  @PostMapping({"/javascript", "js"})
-  public ResponseEntity<?> runJavascriptCode(@RequestBody @Valid Code code) {
-    return ResponseEntity.status(HttpStatus.OK).body(executeService.runJavaScript(code));
-  }
-
   // TODO Java
   @PostMapping({"/java"})
   public ResponseEntity<?> runJavaCode(@RequestBody @Valid Code code) {
     return ResponseEntity.status(HttpStatus.OK).body(executeService.runJava(code));
-  }
-
-  @PostMapping({"/php"})
-  public ResponseEntity<?> runPhpCode(@RequestBody @Valid Code code) {
-    return ResponseEntity.status(HttpStatus.OK).body(executeService.runPhp(code));
   }
 
   // TODO Scala
@@ -77,11 +57,6 @@ public class ExecuteController {
   @PostMapping({"/kotlin"})
   public ResponseEntity<?> runKotlinCode(@RequestBody @Valid Code code) {
     return executeService.runKotlin(code);
-  }
-
-  @PostMapping({"/ruby", "/rb"})
-  public ResponseEntity<?> runRubyCode(@RequestBody @Valid Code code) {
-    return ResponseEntity.status(HttpStatus.OK).body(executeService.runRuby(code));
   }
 
   // TODO Swift

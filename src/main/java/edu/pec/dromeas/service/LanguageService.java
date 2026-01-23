@@ -26,19 +26,6 @@ public class LanguageService {
       case CPP:
         return ".cpp";
 
-      case JavaScript:
-        return ".js";
-
-      case Python2:
-      case Python3:
-        return ".py";
-
-      case Php:
-        return ".php";
-
-      case Ruby:
-        return ".rb";
-
       default:
         throw new ServerException("Unknown Language " + language.name());
     }
@@ -58,21 +45,6 @@ public class LanguageService {
 
       case CPP:
         return "g++";
-
-      case JavaScript:
-        return "node";
-
-      case Php:
-        return "php";
-
-      case Python2:
-        return "python2";
-
-      case Python3:
-        return "python3";
-
-      case Ruby:
-        return "ruby";
 
       default:
         throw new ServerException("Unknown Language " + language.name());

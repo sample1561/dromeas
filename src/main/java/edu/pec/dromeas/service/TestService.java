@@ -211,42 +211,6 @@ public class TestService {
       languages.setCPP(getVersion("g++", "--version"));
       LOGGER.info("CPP = " + languages.getCPP());
 
-      languages.setCS("Not Installed");
-      LOGGER.info("C# = " + languages.getCS());
-
-      languages.setJava(getVersion("java", "--version"));
-      LOGGER.info("Java = " + languages.getJava());
-
-      languages.setScala(getVersion("scala", "-version"));
-      LOGGER.info("Scala = " + languages.getScala());
-
-      languages.setJavaScript(getVersion("node", "--version"));
-      LOGGER.info("JavaScript = " + languages.getJavaScript());
-
-      languages.setPython2(getVersion("python2", "--version"));
-      LOGGER.info("Python2 = " + languages.getPython2());
-
-      languages.setPython3(getVersion("python3", "--version"));
-      LOGGER.info("Python3 = " + languages.getPython3());
-
-      languages.setPhp(getVersion("php", "--version"));
-      LOGGER.info("Php = " + languages.getPhp());
-
-      languages.setGo("Not Installed");
-      LOGGER.info("GoLang = " + languages.getGo());
-
-      languages.setKotlin("Not Installed");
-      LOGGER.info("Kotlin = " + languages.getKotlin());
-
-      languages.setRuby(getVersion("ruby", "--version"));
-      LOGGER.info("Ruby = " + languages.getRuby());
-
-      languages.setRust("Not Installed");
-      LOGGER.info("Rust = " + languages.getRust());
-
-      languages.setSwift("Not Installed");
-      LOGGER.info("Swift = " + languages.getSwift());
-
       return ResponseEntity.status(HttpStatus.OK).body(languages);
 
     } catch (Exception e) {

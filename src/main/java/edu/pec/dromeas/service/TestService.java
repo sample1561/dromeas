@@ -149,8 +149,7 @@ public class TestService {
 
         results.add(currentTest);
 
-        LOGGER.info(
-            "Test: " + (i + 1) + " | Expected: " + outputs[i] + " | Executed: " + execution);
+          LOGGER.info("Test: {} | Expected: {} | Executed: {}", i + 1, outputs[i], execution);
       } catch (Exception e) {
         e.printStackTrace();
         throw new ServerException("Failed to read contents of " + current.getName());
@@ -189,10 +188,10 @@ public class TestService {
       Languages languages = new Languages();
 
       languages.setC(getVersion("gcc", "--version"));
-      LOGGER.info("C = " + languages.getC());
+        LOGGER.info("C = {}", languages.getC());
 
       languages.setCPP(getVersion("g++", "--version"));
-      LOGGER.info("CPP = " + languages.getCPP());
+        LOGGER.info("CPP = {}", languages.getCPP());
 
       return ResponseEntity.status(HttpStatus.OK).body(languages);
 

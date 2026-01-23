@@ -323,13 +323,13 @@ public class TestService {
     Code input = new Code();
     input.setCode(code);
 
-    switch (language) {
-      case C: return executeService.runC(input).getResult();
-      case CPP: return executeService.runCpp(input).getResult();
-      case JavaScript: return executeService.runJavaScript(input).getResult();
-      case Php: return executeService.runPhp(input).getResult();
-      default: throw new ServerException("Server not configured for " + language.name());
-    }
+      return switch (language) {
+          case C -> executeService.runC(input).getResult();
+          case CPP -> executeService.runCpp(input).getResult();
+          case JavaScript -> executeService.runJavaScript(input).getResult();
+          case Php -> executeService.runPhp(input).getResult();
+          default -> throw new ServerException("Server not configured for " + language.name());
+      };
   }
 
   /**

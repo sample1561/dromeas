@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/run")
 public class ExecuteController {
-  private ExecuteService executeService;
+  private final ExecuteService executeService;
 
   public ExecuteController(ExecuteService executeService) {
     this.executeService = executeService;

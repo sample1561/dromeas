@@ -78,10 +78,7 @@ public class TestService {
     Language[] supported = {Language.C, Language.CPP};
 
     for (Language language : supported) {
-      AllResults current = new AllResults();
-      current.setLanguage(language.name());
-      current.setTests(testCode(language));
-
+      AllResults current = new AllResults(language.name(), testCode(language));
       results.add(current);
     }
 
@@ -149,7 +146,7 @@ public class TestService {
 
         results.add(currentTest);
 
-          LOGGER.info("Test: {} | Expected: {} | Executed: {}", i + 1, outputs[i], execution);
+        LOGGER.info("Test: {} | Expected: {} | Executed: {}", i + 1, outputs[i], execution);
       } catch (Exception e) {
         e.printStackTrace();
         throw new ServerException("Failed to read contents of " + current.getName());
@@ -168,11 +165,11 @@ public class TestService {
    * @throws ServerException if language is unrecognized
    */
   private String getType(Language language) {
-      return switch (language) {
-          case C -> "C";
-          case CPP -> "CPP";
-          default -> throw new ServerException("Unrecognised language " + language.name());
-      };
+    return switch (language) {
+      case C -> "C";
+      case CPP -> "CPP";
+      default -> throw new ServerException("Unrecognised language " + language.name());
+    };
   }
 
   /**
@@ -185,10 +182,10 @@ public class TestService {
       Languages languages = new Languages();
 
       languages.setC(getVersion("gcc", "--version"));
-        LOGGER.info("C = {}", languages.getC());
+      LOGGER.info("C = {}", languages.getC());
 
       languages.setCPP(getVersion("g++", "--version"));
-        LOGGER.info("CPP = {}", languages.getCPP());
+      LOGGER.info("CPP = {}", languages.getCPP());
 
       return ResponseEntity.status(HttpStatus.OK).body(languages);
 

@@ -19,11 +19,11 @@ public class LanguageService {
    * @throws ServerException if the language is unknown or unsupported
    */
   public String getExtension(Language language) {
-      return switch (language) {
-          case C -> ".c";
-          case CPP -> ".cpp";
-          default -> throw new ServerException("Unknown Language " + language.name());
-      };
+    return switch (language) {
+      case C -> ".c";
+      case CPP -> ".cpp";
+      default -> throw new ServerException("Unknown Language " + language.name());
+    };
   }
 
   /**
@@ -34,10 +34,10 @@ public class LanguageService {
    * @throws ServerException if the language is unknown or unsupported
    */
   public String getCommand(Language language) {
-      return switch (language) {
-          case C -> "gcc";
-          case CPP -> "g++";
-          default -> throw new ServerException("Unknown Language " + language.name());
-      };
+    return switch (language) {
+      case C -> "gcc";
+      case CPP -> "g++";
+      default -> throw new ServerException("Unknown Language " + language.name());
+    };
   }
 }

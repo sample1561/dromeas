@@ -5,14 +5,12 @@ import static org.apache.commons.io.FileUtils.deleteDirectory;
 import edu.pec.dromeas.config.Language;
 import edu.pec.dromeas.exception.BadRequestException;
 import edu.pec.dromeas.exception.ServerException;
-import edu.pec.dromeas.exception.ServiceNotImplementedException;
 import edu.pec.dromeas.payload.Code;
 import edu.pec.dromeas.payload.Result;
 import java.io.*;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 /**
@@ -65,76 +63,6 @@ public class ExecuteService {
   }
 
   /**
-   * Placeholder for Java execution.
-   *
-   * @param input Code payload
-   * @return Throws ServiceNotImplementedException
-   */
-  public Result runJava(Code input) {
-    throw new ServiceNotImplementedException();
-  }
-
-  /**
-   * Placeholder for Scala execution.
-   *
-   * @param code Code payload
-   * @return Throws ServiceNotImplementedException
-   */
-  public ResponseEntity<?> runScala(Code code) {
-    throw new ServiceNotImplementedException();
-  }
-
-  /**
-   * Placeholder for Go execution.
-   *
-   * @param code Code payload
-   * @return Throws ServiceNotImplementedException
-   */
-  public ResponseEntity<?> runGo(Code code) {
-    throw new ServiceNotImplementedException();
-  }
-
-  /**
-   * Placeholder for Kotlin execution.
-   *
-   * @param code Code payload
-   * @return Throws ServiceNotImplementedException
-   */
-  public ResponseEntity<?> runKotlin(Code code) {
-    throw new ServiceNotImplementedException();
-  }
-
-  /**
-   * Placeholder for Rust execution.
-   *
-   * @param code Code payload
-   * @return Throws ServiceNotImplementedException
-   */
-  public ResponseEntity<?> runRust(Code code) {
-    throw new ServiceNotImplementedException();
-  }
-
-  /**
-   * Placeholder for C# execution.
-   *
-   * @param code Code payload
-   * @return Throws ServiceNotImplementedException
-   */
-  public ResponseEntity<?> runCS(Code code) {
-    throw new ServiceNotImplementedException();
-  }
-
-  /**
-   * Placeholder for Swift execution.
-   *
-   * @param code Code payload
-   * @return Throws ServiceNotImplementedException
-   */
-  public ResponseEntity<?> runSwift(Code code) {
-    throw new ServiceNotImplementedException();
-  }
-
-  /**
    * Executes C or C++ code using GCC compiler.
    *
    * @param input Code payload
@@ -172,26 +100,6 @@ public class ExecuteService {
       e.printStackTrace();
       throw new ServerException("Failed to compile code", e);
     }
-  }
-
-  /**
-   * Executes interpreted languages like Python, PHP, JavaScript, Ruby, etc.
-   *
-   * @param input Code payload
-   * @param language Programming language
-   * @return Result containing execution output
-   */
-  private Result runLanguage(Code input, Language language) {
-    String code = input.getCode();
-    String extension = languageService.getExtension(language);
-    String command = languageService.getCommand(language);
-
-    File directory = fileService.createLocalFile(code, extension);
-
-    ProcessBuilder execute = new ProcessBuilder(command, "code" + extension);
-    execute.directory(directory);
-
-    return execute(execute, directory);
   }
 
   /**

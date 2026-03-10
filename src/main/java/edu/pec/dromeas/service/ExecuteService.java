@@ -81,9 +81,7 @@ public class ExecuteService {
       compile.directory(directory);
       Process temp = compile.start();
 
-      synchronized (temp) {
-        temp.wait();
-      }
+      temp.waitFor();
 
       if (temp.exitValue() != 0) {
         throwError(temp, "Syntax/Compilation Error");

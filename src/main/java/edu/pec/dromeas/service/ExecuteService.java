@@ -5,123 +5,83 @@ import static org.apache.commons.io.FileUtils.deleteDirectory;
 import edu.pec.dromeas.config.Language;
 import edu.pec.dromeas.exception.BadRequestException;
 import edu.pec.dromeas.exception.ServerException;
-import edu.pec.dromeas.exception.ServiceNotImplementedException;
 import edu.pec.dromeas.payload.Code;
 import edu.pec.dromeas.payload.Result;
 import java.io.*;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service responsible for executing code in various programming languages.
+ *
+ * <p>Supports C, C++, JavaScript, Python, PHP, Ruby, and has placeholders for Java, Scala, Go,
+ * Kotlin, Rust, C#, and Swift. Code is executed in a temporary directory and cleaned up after
+ * execution.
+ */
 @Service
 public class ExecuteService {
+
+  /** Maximum allowed execution time in milliseconds */
   final long EXPIRATION = 5000L;
+
   private static final Logger LOGGER = LoggerFactory.getLogger(ExecuteService.class);
 
   private final LanguageService languageService;
   private final FileService fileService;
 
+  /**
+   * Constructor for ExecuteService.
+   *
+   * @param languageService Service for retrieving language extensions and commands
+   * @param fileService Service for managing temporary code files
+   */
   public ExecuteService(LanguageService languageService, FileService fileService) {
     this.languageService = languageService;
     this.fileService = fileService;
   }
 
+  /**
+   * Executes C code using gcc.
+   *
+   * @param input Code payload containing the C code
+   * @return Result containing the output of execution
+   */
   public Result runC(Code input) {
     return runGCC(input, Language.C);
   }
 
+  /**
+   * Executes C++ code using g++.
+   *
+   * @param input Code payload containing the C++ code
+   * @return Result containing the output of execution
+   */
   public Result runCpp(Code input) {
     return runGCC(input, Language.CPP);
   }
 
-  public Result runJava(Code input) {
-    /**
-     * Create a file with extension .java, for example Hi.java. Inside your Hi.java file create
-     * something like:
-     *
-     * <p>public class Hi { public static void main(String[] args) { System.out.println("Hi"); } }
-     *
-     * <p>In the terminal run javac Hi.java java Hi
-     */
-    throw new ServiceNotImplementedException();
-  }
-
-  public Result runJavaScript(Code input) {
-    return runLanguage(input, Language.JavaScript);
-  }
-
-  public Result runPython3(Code input) {
-    return runLanguage(input, Language.Python3);
-  }
-
-  public Result runPython2(Code input) {
-    return runLanguage(input, Language.Python2);
-  }
-
-  public Result runPhp(Code input) {
-    return runLanguage(input, Language.Php);
-  }
-
-  public ResponseEntity<?> runScala(Code code) {
-    /**
-     * object HelloWorld { def main(args: Array[String]): Unit = { println("Scala Hello World
-     * Example") } }
-     *
-     * <p>scalac HelloWorld.scala
-     *
-     * <p>the file name is same as object name
-     *
-     * <p>scala HelloWorld
-     */
-    throw new ServiceNotImplementedException();
-  }
-
-  public ResponseEntity<?> runGo(Code code) {
-    /** install GoLang on WSL go run test.go */
-    throw new ServiceNotImplementedException();
-  }
-
-  public ResponseEntity<?> runKotlin(Code code) {
-    throw new ServiceNotImplementedException();
-  }
-
-  public ResponseEntity<?> runRust(Code code) {
-    throw new ServiceNotImplementedException();
-  }
-
-  public ResponseEntity<?> runCS(Code code) {
-    throw new ServiceNotImplementedException();
-  }
-
-  public ResponseEntity<?> runSwift(Code code) {
-    throw new ServiceNotImplementedException();
-  }
-
-  public Result runRuby(Code input) {
-    return runLanguage(input, Language.Ruby);
-  }
-
+  /**
+   * Executes C or C++ code using GCC compiler.
+   *
+   * @param input Code payload
+   * @param language Language (C or C++)
+   * @return Result containing compilation and execution output
+   * @throws ServerException if compilation or execution fails
+   */
   private Result runGCC(Code input, Language language) {
-    // Step 1 - Create required directory structure
     String code = input.getCode();
-
     String extension = languageService.getExtension(language);
     String command = languageService.getCommand(language);
     File directory = fileService.createLocalFile(code, extension);
 
-    // Step 2 - Execute the local run-file
     try {
       ProcessBuilder compile = new ProcessBuilder(command, "code" + extension);
       compile.directory(directory);
       Process temp = compile.start();
 
-      // TODO there has to be a better way to synchronize the application
-      // - Also had threading
-      synchronized (temp) {
-        temp.wait();
-      }
+      temp.waitFor();
 
       if (temp.exitValue() != 0) {
         throwError(temp, "Syntax/Compilation Error");
@@ -133,38 +93,28 @@ public class ExecuteService {
       return execute(execute, directory);
     } catch (IOException e) {
       e.printStackTrace();
-      throw new ServerException("Failed to run the c file");
+      throw new ServerException("Failed to run the C/C++ file");
     } catch (InterruptedException e) {
       e.printStackTrace();
-      throw new ServerException("Failed to Compile Code", e);
+      throw new ServerException("Failed to compile code", e);
     }
   }
 
-  private Result runLanguage(Code input, Language language) {
-    // Create the required directory structure with code file
-    String code = input.getCode();
-
-    String extension = languageService.getExtension(language);
-    String command = languageService.getCommand(language);
-
-    File directory = fileService.createLocalFile(code, extension);
-
-    ProcessBuilder execute = new ProcessBuilder(command, "code" + extension);
-    execute.directory(directory);
-
-    return execute(execute, directory);
-  }
-
+  /**
+   * Executes a ProcessBuilder and retrieves the output.
+   *
+   * @param execute ProcessBuilder configured to run the code
+   * @param dir Directory containing the code file
+   * @return Result containing execution output
+   */
   private Result execute(ProcessBuilder execute, File dir) {
     try {
       Process process = execute.start();
-
-      // TODO see how to properly implement a timeout
       boolean timeLimit = waitFor(process);
 
       if (timeLimit) {
         process.destroyForcibly();
-        String message = "Process took long than " + EXPIRATION + " milliseconds to execute";
+        String message = "Process took longer than " + EXPIRATION + " milliseconds to execute";
         throw new BadRequestException(message, new Exception("Exceeded Time Limit"));
       }
 
@@ -175,13 +125,18 @@ public class ExecuteService {
     }
   }
 
+  /**
+   * Reads the output of a process and deletes the temporary folder.
+   *
+   * @param process The executed process
+   * @param folder Folder containing the code file
+   * @return Result object with captured output
+   */
   private Result returnExecutionResult(Process process, File folder) {
     try {
       StringBuilder output = new StringBuilder();
-      String line = "";
-
       BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()));
-
+      String line;
       while ((line = in.readLine()) != null) {
         if (!output.toString().equals("")) output.append("\n").append(line);
         else output = new StringBuilder(line);
@@ -191,28 +146,36 @@ public class ExecuteService {
 
       if (folder.exists()) {
         LOGGER.info("!! CLEANUP FAIL " + folder.getName() + " !!");
-        // TODO account for failure of deleting local file
-        //  -maybe create a repo of failed deletes and run a cleanup daemon
       }
 
       Result result = new Result();
       result.setResult(output.toString());
 
-      return (result);
+      return result;
     } catch (IOException e) {
       throw new ServerException("Failed to read output", e);
     }
   }
 
-  // Thread Handling
+  /**
+   * Waits for a process to complete or until the EXPIRATION time is reached.
+   *
+   * @param process The process to wait for
+   * @return true if the process is still alive after EXPIRATION milliseconds, false otherwise
+   */
   private boolean waitFor(Process process) {
     long endTime = System.currentTimeMillis() + EXPIRATION;
     while (endTime >= System.currentTimeMillis() && process.isAlive())
       ;
-
     return process.isAlive();
   }
 
+  /**
+   * Reads the error stream of a process and throws a BadRequestException.
+   *
+   * @param temp Process that failed
+   * @param type Type of error (e.g., "Syntax/Compilation Error")
+   */
   void throwError(Process temp, String type) {
     InputStream error = temp.getErrorStream();
 

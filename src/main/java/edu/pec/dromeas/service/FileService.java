@@ -4,15 +4,31 @@ import edu.pec.dromeas.exception.ServerException;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.UUID;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service responsible for creating and managing temporary local files for code execution. Files are
+ * stored in a scratch folder on the local filesystem.
+ */
 @Service
 public class FileService {
-  final String BASE = new File("").getAbsolutePath() + "/scratch/";
-  final Long UPPER = (long) 1.0E9;
 
+  /** Base directory for temporary files */
+  final String BASE = new File("").getAbsolutePath() + "/scratch/";
+
+  /**
+   * Creates a local folder with a unique hash-based name inside the scratch directory, and writes
+   * the provided code to a file with the given file type.
+   *
+   * @param code The source code content to write
+   * @param fileType The file extension (including the dot), e.g., ".py", ".c"
+   * @return The folder containing the created code file
+   * @throws ServerException If the scratch folder or code file cannot be created
+   */
   public File createLocalFile(String code, String fileType) {
     // First check if the scratch folder exists
     if (!Files.exists(Paths.get(BASE))) {
@@ -20,9 +36,7 @@ public class FileService {
       if (!scratch) throw new ServerException("Failed to create the scratch folder");
     }
 
-    String dirPath = BASE + "dir" + getHash();
-    // System.out.println(dirPath);
-
+    String dirPath = BASE + UUID.randomUUID();
     File folder = new File(dirPath);
 
     if (!folder.mkdir()) {
@@ -32,7 +46,7 @@ public class FileService {
     try {
       String filePath = folder.getAbsolutePath() + "/code" + fileType;
 
-      PrintWriter writer = new PrintWriter(filePath, "UTF-8");
+      PrintWriter writer = new PrintWriter(filePath, StandardCharsets.UTF_8);
       writer.println(code);
       writer.close();
 
@@ -47,9 +61,5 @@ public class FileService {
     }
 
     return folder;
-  }
-
-  private Long getHash() {
-    return (long) (Math.random() * UPPER);
   }
 }

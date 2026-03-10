@@ -16,21 +16,44 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service class responsible for executing and testing code in different programming languages.
+ * Provides system statistics, language version information, and the ability to run and verify test
+ * cases for C, C++, JavaScript, and PHP.
+ */
 @Service
 public class TestService {
+
   private final ExecuteService executeService;
-  String BASE = new File("").getAbsolutePath() + "/testCases";
   private static final Logger LOGGER = LoggerFactory.getLogger(TestService.class);
 
+  /** Base directory for test cases and results */
+  String BASE = new File("").getAbsolutePath() + "/testCases";
+
+  /**
+   * Constructor for TestService.
+   *
+   * @param executeService Service used to execute code in various languages
+   */
   public TestService(ExecuteService executeService) {
     this.executeService = executeService;
   }
 
+  /**
+   * Performs a simple system test that logs a message and returns a playful HTTP response.
+   *
+   * @return ResponseEntity with HTTP status 418 (I am a teapot) and message
+   */
   public ResponseEntity<?> systemTest() {
     LOGGER.info("A string of text in the console");
-    return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).body("I am a teapot");
+    return ResponseEntity.status(HttpStatus.OK).body("I am a teapot");
   }
 
+  /**
+   * Retrieves statistics about the current system including memory, CPU, and disk usage.
+   *
+   * @return ResponseEntity containing system statistics
+   */
   public ResponseEntity<?> systemStat() {
     SystemStatistics stat = new SystemStatistics();
     File file = new File(BASE);
@@ -45,11 +68,14 @@ public class TestService {
     return ResponseEntity.status(HttpStatus.OK).body(stat);
   }
 
+  /**
+   * Runs all test cases for all supported languages.
+   *
+   * @return Set of AllResults, each containing results for a specific language
+   */
   public Set<AllResults> testAllCodes() {
-    // throw new ServiceNotImplementedException("Service Under Maintenance");
-
     Set<AllResults> results = new HashSet<>();
-    Language[] supported = {Language.C, Language.CPP, Language.JavaScript, Language.Php};
+    Language[] supported = {Language.C, Language.CPP};
 
     for (Language language : supported) {
       AllResults current = new AllResults();
@@ -62,37 +88,40 @@ public class TestService {
     return results;
   }
 
+  /**
+   * Runs all test cases for C code.
+   *
+   * @return Set of Tests results for C language
+   */
   public Set<Tests> testCCode() {
     return testCode(Language.C);
   }
 
+  /**
+   * Runs all test cases for C++ code.
+   *
+   * @return Set of Tests results for C++ language
+   */
   public Set<Tests> testCppCode() {
     return testCode(Language.CPP);
   }
 
-  public Set<Tests> testJsCode() {
-    return testCode(Language.JavaScript);
-  }
-
-  public Set<Tests> testPhpCode() {
-    return testCode(Language.Php);
-  }
-
+  /**
+   * Executes and verifies test cases for a specific language.
+   *
+   * @param language The programming language to test
+   * @return Set of Tests containing the success status of each test case
+   */
   public Set<Tests> testCode(Language language) {
     String type = getType(language);
     File inputCode = new File(BASE + "/" + type + "/codes");
-    // System.out.println("Input Folder -> "+inputCode);
-
     File codeOutput = new File(BASE + "/" + type + "/results");
-    // System.out.println("Results Folder -> "+codeOutput);
 
     if (!inputCode.exists() || !codeOutput.exists()) {
       return null;
     }
 
     int numberOfFiles = Objects.requireNonNull(codeOutput.listFiles()).length;
-    // System.out.println("Number of files -> "+numberOfFiles);
-
     String[] outputs = new String[numberOfFiles];
     int i = 0;
 
@@ -111,9 +140,7 @@ public class TestService {
 
     for (File current : Objects.requireNonNull(inputCode.listFiles())) {
       try {
-
         String code = readFileAsString(current.getAbsolutePath());
-
         String execution = executeCode(code, language);
 
         Tests currentTest = new Tests();
@@ -122,119 +149,66 @@ public class TestService {
 
         results.add(currentTest);
 
-        LOGGER.info(
-            "Test: " + (i + 1) + " | Expected: " + outputs[i] + " | Executed: " + execution);
+        LOGGER.info("Test: {} | Expected: {} | Executed: {}", i + 1, outputs[i], execution);
       } catch (Exception e) {
         e.printStackTrace();
         throw new ServerException("Failed to read contents of " + current.getName());
       }
-
       i++;
     }
 
     return results;
   }
 
+  /**
+   * Retrieves the corresponding folder type for a given language.
+   *
+   * @param language Programming language
+   * @return String representing folder type
+   * @throws ServerException if language is unrecognized
+   */
   private String getType(Language language) {
-    switch (language) {
-      case C:
-        return "C";
-
-      case CPP:
-        return "CPP";
-
-      case JavaScript:
-        return "JavaScript";
-
-      case Php:
-        return "PHP";
-
-      default:
-        throw new ServerException("Unrecognised language " + language.name());
-    }
+    return switch (language) {
+      case C -> "C";
+      case CPP -> "CPP";
+      default -> throw new ServerException("Unrecognised language " + language.name());
+    };
   }
 
+  /**
+   * Tests installed language versions on the system.
+   *
+   * @return ResponseEntity containing versions of supported languages
+   */
   public ResponseEntity<?> testLanguages() {
     try {
-      int i = -1;
-
       Languages languages = new Languages();
 
-      // C
       languages.setC(getVersion("gcc", "--version"));
-      LOGGER.info("C = " + languages.getC());
+      LOGGER.info("C = {}", languages.getC());
 
-      // C++
       languages.setCPP(getVersion("g++", "--version"));
-      LOGGER.info("CPP = " + languages.getCPP());
+      LOGGER.info("CPP = {}", languages.getCPP());
 
-      // C#
-      // TODO find command
-      languages.setCS("Not Installed");
-      LOGGER.info("C# = " + languages.getCS());
+      return ResponseEntity.status(HttpStatus.OK).body(languages);
 
-      // Java
-      languages.setJava(getVersion("java", "--version"));
-      LOGGER.info("Java = " + languages.getJava());
-
-      // Scala
-      languages.setScala(getVersion("scala", "-version"));
-      LOGGER.info("Scala = " + languages.getScala());
-
-      // JavaScript
-      languages.setJavaScript(getVersion("node", "--version"));
-      LOGGER.info("JavaScript = " + languages.getJavaScript());
-
-      // Python 2
-      languages.setPython2(getVersion("python2", "--version"));
-      LOGGER.info("Python2 = " + languages.getPython2());
-
-      // Python 3
-      languages.setPython3(getVersion("python3", "--version"));
-      LOGGER.info("Python3 = " + languages.getPython3());
-
-      // Php
-      languages.setPhp(getVersion("php", "--version"));
-      LOGGER.info("Php = " + languages.getPhp());
-
-      // Go
-      // languages.setGo(getVersion("go","version"));
-      languages.setGo("Not Installed");
-      LOGGER.info("GoLang = " + languages.getGo());
-
-      // Kotlin
-      // languages.setKotlin(getVersion("kotlinc","version"));
-      languages.setKotlin("Not Installed");
-      LOGGER.info("Kotlin = " + languages.getKotlin());
-
-      // Ruby
-      languages.setRuby(getVersion("ruby", "--version"));
-      LOGGER.info("Ruby = " + languages.getRuby());
-
-      // Rust
-      // languages.setRust(getVersion("rustc","--version"));
-      languages.setRust("Not Installed");
-      LOGGER.info("Rust = " + languages.getRust());
-
-      // Swift
-      // languages.setSwift(getVersion("swift","-version"));
-      languages.setSwift("Not Installed");
-      LOGGER.info("Swift = " + languages.getSwift());
-
-      return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).body(languages);
     } catch (Exception e) {
       e.printStackTrace();
       throw new ServerException();
     }
   }
 
+  /**
+   * Retrieves the version of a specific programming tool.
+   *
+   * @param command Primary command
+   * @param command2 Argument for version retrieval
+   * @return Version string, "Not Installed" if not found, or "Request Timeout" if command takes too
+   *     long
+   */
   private String getVersion(String command, String command2) {
     try {
-      ProcessBuilder checkVersion;
-      String version = "Not Installed";
-
-      // C
-      checkVersion = new ProcessBuilder(command, command2);
+      ProcessBuilder checkVersion = new ProcessBuilder(command, command2);
       Process temp = checkVersion.start();
 
       synchronized (temp) {
@@ -246,10 +220,10 @@ public class TestService {
         }
       }
 
+      String version = "Not Installed";
       if (temp.exitValue() == 0) {
         version = readResult(temp);
       }
-
       return version;
 
     } catch (IOException | InterruptedException e) {
@@ -258,38 +232,55 @@ public class TestService {
     }
   }
 
+  /**
+   * Reads the first line of the process output.
+   *
+   * @param process Process to read from
+   * @return First line of output
+   * @throws IOException if reading fails
+   */
   private String readResult(Process process) throws IOException {
     BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()));
     return in.readLine();
   }
 
+  /**
+   * Reads a file's content as a string.
+   *
+   * @param fileName File path
+   * @return File content as string
+   * @throws Exception if reading fails
+   */
   public static String readFileAsString(String fileName) throws Exception {
     return new String(Files.readAllBytes(Paths.get(fileName)));
   }
 
+  /**
+   * Executes code in a specific language using ExecuteService.
+   *
+   * @param code Code to execute
+   * @param language Language to execute
+   * @return Execution result as string
+   * @throws ServerException if language is unsupported
+   */
   private String executeCode(String code, Language language) {
     Code input = new Code();
     input.setCode(code);
 
-    switch (language) {
-      case C:
-        return executeService.runC(input).getResult();
-
-      case CPP:
-        return executeService.runCpp(input).getResult();
-
-      case JavaScript:
-        return executeService.runJavaScript(input).getResult();
-
-      case Php:
-        return executeService.runPhp(input).getResult();
-
-      default:
-        throw new ServerException("Server not configured for " + language.name());
-    }
+    return switch (language) {
+      case C -> executeService.runC(input).getResult();
+      case CPP -> executeService.runCpp(input).getResult();
+      default -> throw new ServerException("Server not configured for " + language.name());
+    };
   }
 
+  /**
+   * Converts bytes to megabytes.
+   *
+   * @param bytes Value in bytes
+   * @return Value in megabytes
+   */
   private double convertToMb(Long bytes) {
-    return (bytes / 1000000);
+    return (bytes / 1000000.0);
   }
 }

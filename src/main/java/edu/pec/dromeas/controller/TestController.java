@@ -44,14 +44,4 @@ public class TestController {
   public ResponseEntity<?> testCppCodes() {
     return ResponseEntity.ok(testService.testCppCode());
   }
-
-  @GetMapping({"/js", "/javascript"})
-  public ResponseEntity<?> testJsCodes() {
-    return ResponseEntity.ok(testService.testJsCode());
-  }
-
-  @GetMapping({"/php"})
-  public ResponseEntity<?> testPhpCodes() {
-    return ResponseEntity.ok(testService.testPhpCode());
-  }
 }

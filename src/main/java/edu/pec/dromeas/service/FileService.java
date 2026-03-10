@@ -7,6 +7,8 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.UUID;
+
 import org.springframework.stereotype.Service;
 
 /**
@@ -18,9 +20,6 @@ public class FileService {
 
   /** Base directory for temporary files */
   final String BASE = new File("").getAbsolutePath() + "/scratch/";
-
-  /** Upper limit for random hash generation */
-  final Long UPPER = (long) 1.0E9;
 
   /**
    * Creates a local folder with a unique hash-based name inside the scratch directory, and writes
@@ -38,7 +37,7 @@ public class FileService {
       if (!scratch) throw new ServerException("Failed to create the scratch folder");
     }
 
-    String dirPath = BASE + "dir" + getHash();
+    String dirPath = BASE + UUID.randomUUID();
     File folder = new File(dirPath);
 
     if (!folder.mkdir()) {
@@ -63,14 +62,5 @@ public class FileService {
     }
 
     return folder;
-  }
-
-  /**
-   * Generates a random hash number used for creating unique folder names.
-   *
-   * @return A long value representing a random hash
-   */
-  private Long getHash() {
-    return (long) (Math.random() * UPPER);
   }
 }
